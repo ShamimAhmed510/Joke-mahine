@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Joke Machine</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,600;9..144,900&display=swap');
+
+  :root {
+    --teal: #163832;
+    --teal-deep: #0e2622;
+    --paper: #fbf3e2;
+    --paper-shadow: #e9dfc6;
+    --ink: #2b2118;
+    --ink-soft: #6b6152;
+    --amber: #e0a52c;
+    --amber-dark: #b3821e;
+    --red: #b5482f;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--teal);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
+    background-size: 22px 22px;
+    font-family: 'Space Mono', monospace;
+    padding: 32px 16px;
+  }
+
+  .rig {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .marquee {
+    color: var(--paper);
+    text-align: center;
+  }
+
+  .marquee h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 40px);
+    letter-spacing: 0.01em;
+    margin: 0 0 6px;
+  }
+
+  .marquee p {
+    margin: 0;
+    font-size: 13px;
+    color: #a9c4bd;
+    max-width: 34ch;
+  }
+
+  /* --- Ticket --- */
+  .ticket {
+    position: relative;
+    width: min(420px, 88vw);
+    background: var(--paper);
+    padding: 34px 28px 40px;
+    box-shadow: 0 22px 40px rgba(0,0,0,0.35);
+    clip-path: polygon(
+      0% 10px, 4% 0%, 8% 10px, 12% 0%, 16% 10px, 20% 0%, 24% 10px, 28% 0%,
+      32% 10px, 36% 0%, 40% 10px, 44% 0%, 48% 10px, 52% 0%, 56% 10px, 60% 0%,
+      64% 10px, 68% 0%, 72% 10px, 76% 0%, 80% 10px, 84% 0%, 88% 10px, 92% 0%,
+      96% 10px, 100% 0%,
+      100% calc(100% - 10px), 96% 100%, 92% calc(100% - 10px), 88% 100%,
+      84% calc(100% - 10px), 80% 100%, 76% calc(100% - 10px), 72% 100%,
+      68% calc(100% - 10px), 64% 100%, 60% calc(100% - 10px), 56% 100%,
+      52% calc(100% - 10px), 48% 100%, 44% calc(100% - 10px), 40% 100%,
+      36% calc(100% - 10px), 32% 100%, 28% calc(100% - 10px), 24% 100%,
+      20% calc(100% - 10px), 16% 100%, 12% calc(100% - 10px), 8% 100%,
+      4% calc(100% - 10px), 0% 100%
+    );
+  }
+
+  .ticket::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; top: 78px;
+    border-top: 2px dashed var(--paper-shadow);
+  }
+
+  .stub-label {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink-soft);
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 14px;
+    border-bottom: none;
+  }
+
+  .stub-label span:last-child { color: var(--amber-dark); }
+
+  .joke-window {
+    min-height: 140px;
+    display: flex;
+    align-items: center;
+    padding-top: 26px;
+  }
+
+  .joke-text {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--ink);
+    margin: 0;
+  }
+
+  .placeholder { color: var(--ink-soft); font-family: 'Space Mono', monospace; font-size: 14px; }
+
+  .status-line {
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+
+  .status-line.error { color: var(--red); }
+
+  .dots::after {
+    content: '';
+    animation: dots 1.2s steps(4, end) infinite;
+  }
+  @keyframes dots {
+    0% { content: ''; } 25% { content: '.'; } 50% { content: '..'; } 75% { content: '...'; }
+  }
+
+  /* --- Button --- */
+  button#getJoke {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: var(--teal-deep);
+    background: var(--amber);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 var(--amber-dark);
+    transition: transform 0.08s ease, box-shadow 0.08s ease;
+  }
+
+  button#getJoke:hover { filter: brightness(1.04); }
+
+  button#getJoke:active {
+    transform: translateY(4px);
+    box-shadow: 0 0 0 var(--amber-dark);
+  }
+
+  button#getJoke:disabled {
+    cursor: default;
+    filter: grayscale(0.3) brightness(0.95);
+  }
+
+  button#getJoke:focus-visible {
+    outline: 3px solid var(--paper);
+    outline-offset: 3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dots::after { animation: none; content: '...'; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="rig">
+    <div class="marquee">
+      <h1>The Joke Machine</h1>
+      <p>Pull the lever. One joke, dispensed fresh, no refunds.</p>
+    </div>
+
+    <div class="ticket">
+      <div class="stub-label">
+        <span>NO. <span id="ticketNo">000</span></span>
+        <span>ADMIT ONE LAUGH</span>
+      </div>
+      <div class="joke-window">
+        <p class="joke-text placeholder" id="jokeText">Press the button to print your joke.</p>
+      </div>
+    </div>
+
+    <button id="getJoke">Get Joke</button>
+    <p class="status-line" id="statusLine" aria-live="polite"></p>
+  </div>
+
+<script>
+  const btn = document.getElementById('getJoke');
+  const jokeText = document.getElementById('jokeText');
+  const statusLine = document.getElementById('statusLine');
+  const ticketNo = document.getElementById('ticketNo');
+
+  async function getJoke() {
+    btn.disabled = true;
+    jokeText.classList.add('placeholder');
+    jokeText.textContent = '';
+    statusLine.classList.remove('error');
+    statusLine.innerHTML = 'Printing<span class="dots"></span>';
+
+    try {
+      const res = await fetch('https://icanhazdadjoke.com/', {
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (!res.ok) throw new Error('Machine jammed (status ' + res.status + ')');
+
+      const data = await res.json();
+
+      jokeText.classList.remove('placeholder');
+      jokeText.textContent = data.joke;
+      ticketNo.textContent = String(Math.floor(Math.random() * 900) + 100);
+      statusLine.textContent = 'Fresh joke, printed just now.';
+    } catch (err) {
+      jokeText.classList.add('placeholder');
+      jokeText.textContent = 'The machine jammed. No joke came out.';
+      statusLine.textContent = 'Error: ' + err.message + ' — try again.';
+      statusLine.classList.add('error');
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  btn.addEventListener('click', getJoke);
+</script>
+
+</body>
+</html>
